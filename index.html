@@ -1013,8 +1013,15 @@
       try {
         // Yerelde (file://) gerçek gönderim yapılamaz -> demo
         if (location.protocol === 'file:') throw { demo: true };
-        // Netlify Forms: form verisini (dosyalar dahil) mevcut sayfaya POST et
-        const res = await fetch('/', { method: 'POST', body: new FormData(wizard) });
+        // Form verisini topla (dosya alanları hariç) ve API'ye JSON olarak gönder
+        const fd = new FormData(wizard);
+        const data = {};
+        fd.forEach((value, key) => { if (!(value instanceof File)) data[key] = value; });
+        const res = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
         if (!res.ok) throw new Error('network');
         showSuccess();
       } catch (err) {
