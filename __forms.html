@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head><meta charset="UTF-8"><title>Netlify Form Detection</title></head>
+<body>
+  <!-- Bu dosya yalnızca Netlify'ın formu ve tüm alanlarını tanıması içindir.
+       Ziyaretçiye gösterilmez; gerçek form index.html içindedir. -->
+  <form name="teklif-talebi" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data" hidden>
+    <input type="hidden" name="form-name" value="teklif-talebi">
+    <input name="bot-field">
+
+    <!-- Adım 1: Sigorta & Proje -->
+    <input type="text" name="sigorta_konusu">
+    <input type="text" name="rol">
+    <input type="text" name="proje_adi">
+    <input type="text" name="proje_bedeli">
+    <input type="text" name="para_birimi">
+    <input type="text" name="proje_baslangic">
+    <input type="text" name="proje_bitis">
+    <input type="text" name="sure_ay">
+
+    <!-- Adım 2: Riziko & Adres -->
+    <input type="text" name="yapi_tarzi">
+    <input type="text" name="riziko_turu">
+    <input type="text" name="noter_adi">
+    <input type="text" name="sozlesme_tarihi">
+    <input type="text" name="yevmiye_no">
+    <input type="text" name="m2_konut">
+    <input type="text" name="m2_isyeri">
+    <input type="text" name="m2_eklenti">
+    <input type="text" name="m2_ortak">
+    <input type="text" name="m2_arsa_sahipleri">
+    <input type="text" name="m2_toplam">
+    <input type="text" name="il">
+    <input type="text" name="ilce">
+    <input type="text" name="mahalle">
+    <input type="text" name="cadde_sokak">
+    <input type="text" name="bina_no">
+    <input type="text" name="bb_no">
+    <input type="text" name="uavt">
+    <input type="text" name="ada">
+    <input type="text" name="parsel">
+    <input type="text" name="bb_sayisi">
+
+    <!-- Adım 3: Taraflar -->
+    <input type="text" name="sig_tckn">
+    <input type="text" name="sig_dogum">
+    <input type="text" name="sig_ad">
+    <input type="text" name="sig_telefon">
+    <input type="text" name="sig_eposta">
+    <input type="text" name="sig_il_ilce">
+    <input type="text" name="sig_adres">
+    <input type="text" name="ettiren_ayni">
+    <input type="text" name="ett_tckn">
+    <input type="text" name="ett_dogum">
+    <input type="text" name="ett_ad">
+    <input type="text" name="ett_telefon">
+    <input type="text" name="ett_eposta">
+    <input type="text" name="ett_il_ilce">
+    <input type="text" name="talep_ad">
+    <input type="text" name="talep_telefon">
+    <input type="text" name="talep_eposta">
+    <input type="text" name="talep_acente">
+
+    <!-- Adım 4: Belgeler & Onay -->
+    <input type="file" name="belgeler">
+    <textarea name="not"></textarea>
+    <input type="text" name="sozlesme_onay">
+    <input type="text" name="kvkk_onay">
+    <input type="text" name="acik_riza">
+  </form>
+</body>
+</html>

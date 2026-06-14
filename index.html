@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BinaGüvence — Bina Tamamlama Sigortası</title>
+  <meta name="description" content="Kentsel dönüşümde projeniz yarıda kalsa bile binanız tamamlanır. Bina tamamlama sigortası ile mülk sahipleri ve müteahhitler için güvence.">
+
+  <!-- Google Fonts — Brutalist Signal preset -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'brand-primary': '#E8E4DD',
+            'brand-accent': '#E63B2E',
+            'brand-bg': '#F5F3EE',
+            'brand-text': '#111111',
+            'brand-surface': '#FFFFFF',
+          },
+          fontFamily: {
+            'heading': ['Space Grotesk', 'sans-serif'],
+            'drama': ['DM Serif Display', 'serif'],
+            'mono': ['Space Mono', 'monospace'],
+            'body': ['Space Grotesk', 'sans-serif'],
+          },
+          borderRadius: {
+            'card': '2rem',
+            'pill': '3rem',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-rgb: 245, 243, 238;
+      --border-rgb: 17, 17, 17;
+      --brand-accent: #E63B2E;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: #F5F3EE; color: #111111; -webkit-font-smoothing: antialiased; }
+
+    .noise-overlay {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 9999; opacity: 0.05;
+    }
+    .noise-overlay svg { width: 100%; height: 100%; }
+
+    .navbar-transparent { background: transparent; border: 1px solid transparent; }
+    .navbar-scrolled {
+      background: rgba(var(--bg-rgb), 0.7);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(var(--border-rgb), 0.15);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .feature-card {
+      background: #FFFFFF; border: 1px solid rgba(var(--border-rgb), 0.1);
+      border-radius: 2rem; padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); overflow: hidden;
+    }
+
+    .magnetic-btn { transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+    @media (hover: hover) { .magnetic-btn:hover { transform: scale(1.03); } }
+
+    .nav-link { transition: transform 0.3s ease, color 0.3s ease; }
+    @media (hover: hover) { .nav-link:hover { transform: translateY(-1px); color: #E63B2E; } }
+
+    #whatsapp-float { animation: wp-pulse 2s infinite; }
+    @keyframes wp-pulse {
+      0%, 100% { box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
+      50% { box-shadow: 0 4px 30px rgba(37, 211, 102, 0.6); }
+    }
+
+    /* Form */
+    .field {
+      width: 100%; padding: 0.7rem 0.9rem; border-radius: 0.75rem;
+      background: #F5F3EE; border: 1px solid rgba(17, 17, 17, 0.12);
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem;
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+    .field:focus { outline: none; border-color: #E63B2E; background: #fff; }
+    .field.invalid { border-color: #E63B2E; background: rgba(230,59,46,0.05); }
+    .field-label {
+      font-family: 'Space Mono', monospace; font-size: 0.68rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: rgba(17, 17, 17, 0.55); margin-bottom: 0.35rem; display: block;
+    }
+    .field-label .req { color: #E63B2E; }
+
+    .group-title { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.1rem; }
+    .group-title h4 { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.05rem; }
+    .group-num {
+      font-family: 'Space Mono'; font-size: 0.7rem; color: #E63B2E;
+      border: 1px solid rgba(230,59,46,0.3); border-radius: 0.4rem; padding: 0.15rem 0.5rem;
+    }
+
+    /* Subject radio cards */
+    .subject-card {
+      border: 1px solid rgba(17,17,17,0.12); border-radius: 1rem; padding: 1.1rem;
+      cursor: pointer; transition: all 0.25s ease; background: #F5F3EE;
+    }
+    .subject-card:has(input:checked) {
+      border-color: #E63B2E; background: #fff; box-shadow: 0 0 0 1px #E63B2E inset;
+    }
+    .subject-card input { display: none; }
+
+    /* Role pills */
+    .role-pill {
+      border: 1px solid rgba(17,17,17,0.12); border-radius: 3rem; padding: 0.6rem 1.1rem;
+      cursor: pointer; transition: all 0.25s ease; font-size: 0.85rem; font-weight: 600;
+      font-family: 'Space Grotesk'; background: #F5F3EE; display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+    .role-pill:has(input:checked) { background: #111; color: #fff; border-color: #111; }
+    .role-pill input { display: none; }
+
+    /* Wizard steps */
+    .wizard-step { display: none; }
+    .wizard-step.active { display: block; animation: stepIn 0.4s ease; }
+    @keyframes stepIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .step-dot {
+      width: 2rem; height: 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Mono'; font-size: 0.8rem; font-weight: 700;
+      background: #F5F3EE; border: 1px solid rgba(17,17,17,0.15); color: rgba(17,17,17,0.4);
+      transition: all 0.3s ease; flex-shrink: 0;
+    }
+    .step-dot.active { background: #E63B2E; border-color: #E63B2E; color: #fff; }
+    .step-dot.done { background: #111; border-color: #111; color: #fff; }
+    .step-bar { height: 2px; flex: 1; background: rgba(17,17,17,0.12); transition: background 0.4s ease; }
+    .step-bar.done { background: #111; }
+
+    .dropzone {
+      border: 1.5px dashed rgba(17,17,17,0.25); border-radius: 0.75rem;
+      transition: border-color 0.3s ease, background 0.3s ease; cursor: pointer;
+    }
+    @media (hover: hover) { .dropzone:hover { border-color: #E63B2E; background: rgba(230,59,46,0.03); } }
+
+    .timeline { border-left: 2px solid rgba(230,59,46,0.2); }
+    .grid-cell { transition: background-color 0.3s ease; }
+
+    .same-toggle input { display: none; }
+
+    /* Hukuki metin linkleri */
+    .doc-link {
+      color: #E63B2E; font-weight: 600; text-decoration: underline;
+      text-underline-offset: 2px; cursor: pointer; background: none; border: none;
+      padding: 0; font: inherit; transition: opacity 0.2s ease;
+    }
+    .doc-link:hover { opacity: 0.7; }
+
+    /* Modal */
+    #doc-modal { position: fixed; inset: 0; z-index: 100; display: none; }
+    #doc-modal.open { display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    #doc-modal .doc-backdrop { position: absolute; inset: 0; background: rgba(17,17,17,0.55); backdrop-filter: blur(4px); animation: fadeIn 0.25s ease; }
+    #doc-modal .doc-panel {
+      position: relative; background: #fff; border-radius: 1.75rem; width: 100%; max-width: 42rem;
+      max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.3); animation: panelIn 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes panelIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .doc-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.5rem 1.75rem; border-bottom: 1px solid rgba(17,17,17,0.1); }
+    .doc-body { padding: 1.75rem; overflow-y: auto; font-family: 'Space Grotesk', sans-serif; color: rgba(17,17,17,0.78); font-size: 0.9rem; line-height: 1.65; }
+    .doc-body h4 { font-weight: 700; color: #111; font-size: 0.95rem; margin: 1.3rem 0 0.4rem; }
+    .doc-body h4:first-child { margin-top: 0; }
+    .doc-body p { margin-bottom: 0.7rem; }
+    .doc-body ul { list-style: disc; padding-left: 1.2rem; margin-bottom: 0.7rem; }
+    .doc-body li { margin-bottom: 0.3rem; }
+    .doc-body .meta { font-family: 'Space Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(17,17,17,0.45); }
+  </style>
+</head>
+<body class="font-body antialiased overflow-x-hidden">
+
+  <!-- Noise overlay -->
+  <div class="noise-overlay">
+    <svg width="100%" height="100%">
+      <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter>
+      <rect width="100%" height="100%" filter="url(#noise)" opacity="0.5"/>
+    </svg>
+  </div>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav id="navbar" class="navbar-transparent fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-5xl rounded-pill transition-all duration-500">
+    <div class="flex items-center justify-between px-6 py-3">
+      <a href="#hero" class="font-heading font-bold text-lg tracking-tight flex items-center gap-2">
+        <span class="inline-block w-2.5 h-2.5 bg-brand-accent rounded-sm"></span>
+        BinaGüvence
+      </a>
+      <div class="hidden md:flex items-center gap-8 font-heading text-sm font-medium">
+        <a href="#nedir" class="nav-link">Nedir?</a>
+        <a href="#surec" class="nav-link">Nasıl Çalışır</a>
+        <a href="#faydalar" class="nav-link">Faydalar</a>
+        <a href="#basvuru" class="nav-link">Başvuru</a>
+      </div>
+      <a href="#basvuru" class="relative overflow-hidden bg-brand-accent text-white px-5 py-2.5 rounded-pill font-heading font-semibold text-sm magnetic-btn">
+        <span class="relative z-10">Teklif Al</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ===================== HERO ===================== -->
+  <header id="hero" class="relative min-h-screen flex items-end overflow-hidden">
+    <div class="absolute inset-0 z-0">
+      <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1600&q=80" alt="Kentsel dönüşüm inşaat alanı" class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-text via-brand-text/75 to-brand-text/30"></div>
+    </div>
+    <div class="relative z-10 px-6 md:px-16 pb-20 pt-32 w-full max-w-6xl mx-auto">
+      <span class="hero-badge inline-flex items-center gap-2 bg-brand-accent/15 border border-brand-accent/40 text-white px-4 py-1.5 rounded-pill font-mono text-xs uppercase tracking-widest mb-8">
+        <span class="w-2 h-2 rounded-full bg-brand-accent animate-pulse"></span>
+        Kentsel Dönüşüm Güvencesi
+      </span>
+      <h1 class="text-white leading-[0.95]">
+        <span class="hero-line-1 block font-heading font-medium text-2xl md:text-4xl mb-2">Projeniz yarıda kalsa bile</span>
+        <span class="hero-line-2 block font-drama italic text-5xl md:text-7xl lg:text-8xl">binanız tamamlanır.</span>
+      </h1>
+      <p class="hero-subtitle font-mono text-sm md:text-base text-white/70 max-w-xl mt-8 leading-relaxed">
+        Bina Tamamlama Sigortası, müteahhit yükümlülüğünü yerine getiremezse devreye girer. Mülk sahibinin hakkını, müteahhidin itibarını teminat altına alır.
+      </p>
+      <div class="hero-cta flex flex-wrap items-center gap-4 mt-10">
+        <a href="#basvuru" class="inline-flex items-center gap-2 bg-brand-accent text-white px-7 py-4 rounded-pill font-heading font-semibold text-base magnetic-btn">
+          Ücretsiz Teklif Al <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </a>
+        <a href="#nedir" class="inline-flex items-center gap-2 text-white/90 border border-white/25 px-7 py-4 rounded-pill font-heading font-medium text-base magnetic-btn">
+          Nasıl Çalışır?
+        </a>
+      </div>
+      <div class="hero-stats flex flex-wrap gap-10 mt-14">
+        <div><span class="font-mono text-2xl md:text-3xl font-bold text-brand-accent">%100</span><span class="block text-xs font-mono uppercase tracking-widest text-white/60 mt-1">Teslim Teminatı</span></div>
+        <div><span class="font-mono text-2xl md:text-3xl font-bold text-white">48<span class="text-brand-accent">sa</span></span><span class="block text-xs font-mono uppercase tracking-widest text-white/60 mt-1">İçinde Ön Teklif</span></div>
+        <div><span class="font-mono text-2xl md:text-3xl font-bold text-white">0<span class="text-brand-accent">₺</span></span><span class="block text-xs font-mono uppercase tracking-widest text-white/60 mt-1">Başvuru Ücreti</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== METRICS BAR ===================== -->
+  <section class="py-10 border-b border-brand-text/10 bg-brand-surface">
+    <div class="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div><span class="text-3xl md:text-4xl font-heading font-bold" data-count="1200">0</span><span class="text-brand-accent text-3xl md:text-4xl font-heading font-bold">+</span><p class="text-xs font-mono uppercase tracking-widest text-brand-text/50 mt-1">Teminat Altındaki Konut</p></div>
+      <div><span class="text-3xl md:text-4xl font-heading font-bold" data-count="85">0</span><span class="text-brand-accent text-3xl md:text-4xl font-heading font-bold">+</span><p class="text-xs font-mono uppercase tracking-widest text-brand-text/50 mt-1">Anlaşmalı Müteahhit</p></div>
+      <div><span class="text-3xl md:text-4xl font-heading font-bold">%<span data-count="100">0</span></span><p class="text-xs font-mono uppercase tracking-widest text-brand-text/50 mt-1">Lisanslı Sigorta Şirketi</p></div>
+      <div><span class="text-3xl md:text-4xl font-heading font-bold text-brand-accent" data-count="40">0</span><p class="text-xs font-mono uppercase tracking-widest text-brand-text/50 mt-1">İl Genelinde Hizmet</p></div>
+    </div>
+  </section>
+
+  <!-- ===================== FEATURES ===================== -->
+  <section id="ozellikler" class="py-24 px-6 bg-brand-bg">
+    <div class="max-w-6xl mx-auto">
+      <span class="font-mono text-xs uppercase tracking-widest text-brand-accent">Neden Bina Tamamlama Sigortası</span>
+      <h2 class="font-heading font-bold text-3xl md:text-5xl mt-3 mb-4 tracking-tight">Yarım kalan bir inşaat<br>artık herkesin kâbusu değil.</h2>
+      <p class="font-body text-brand-text/60 max-w-xl mb-16">Müteahhidin iflası, projeyi terk etmesi veya finansal tıkanma. Bina Tamamlama Sigortası bu üç riski de tek poliçeyle teminat altına alır.</p>
+      <div class="grid md:grid-cols-3 gap-6">
+
+        <div class="feature-card relative min-h-[320px] flex flex-col justify-end">
+          <div class="inset-x-6 top-6 h-32 relative">
+            <div class="shuffler-item absolute inset-0 bg-brand-bg border border-brand-text/10 rounded-xl p-4 shadow-sm z-30 translate-y-0 scale-100 opacity-100 transition-all duration-500">
+              <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 rounded-full bg-brand-accent"></div><span class="font-mono text-xs uppercase tracking-widest text-brand-text/60">Müteahhit iflası</span></div>
+              <p class="font-heading font-medium text-sm">Sigorta devreye girer, inşaat tamamlanır.</p>
+            </div>
+            <div class="shuffler-item absolute inset-0 bg-brand-bg border border-brand-text/10 rounded-xl p-4 shadow-sm z-20 translate-y-3 scale-[0.95] opacity-60 transition-all duration-500">
+              <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 rounded-full bg-brand-text/20"></div><span class="font-mono text-xs uppercase tracking-widest text-brand-text/60">Proje terk edildi</span></div>
+              <p class="font-heading font-medium text-sm">Daireniz teminat tutarınca güvencede.</p>
+            </div>
+            <div class="shuffler-item absolute inset-0 bg-brand-bg border border-brand-text/10 rounded-xl p-4 shadow-sm z-10 translate-y-6 scale-[0.9] opacity-30 transition-all duration-500">
+              <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 rounded-full bg-brand-text/20"></div><span class="font-mono text-xs uppercase tracking-widest text-brand-text/60">Finansal tıkanma</span></div>
+              <p class="font-heading font-medium text-sm">Mülk sahibinin hakkı korunur.</p>
+            </div>
+          </div>
+          <h3 class="font-heading font-bold text-xl mt-8 mb-2">Teminat Altında Teslim</h3>
+          <p class="font-body text-sm text-brand-text/70">Hangi risk gerçekleşirse gerçekleşsin sonuç değişmez: bina biter ya da hakkınız tazmin edilir.</p>
+        </div>
+
+        <div class="feature-card min-h-[320px] flex flex-col">
+          <div class="bg-brand-text text-brand-surface rounded-xl p-4 mb-6 flex-1 border border-brand-text/20 shadow-inner relative overflow-hidden">
+            <div class="absolute top-4 right-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse"></span><span class="font-mono text-[0.65rem] uppercase tracking-widest text-white/60">Risk Analizi</span></div>
+            <div class="font-mono text-sm leading-relaxed mt-8 text-white/90"><span class="text-brand-accent">> </span><span id="typewriter-text"></span><span class="animate-pulse bg-brand-accent w-1.5 h-4 inline-block align-middle ml-1"></span></div>
+          </div>
+          <h3 class="font-heading font-bold text-xl mb-2">Şeffaf Risk Analizi</h3>
+          <p class="font-body text-sm text-brand-text/70">Müteahhidin mali gücü, geçmiş projeleri ve sözleşme detayları lisanslı sigortacı tarafından objektif değerlendirilir.</p>
+        </div>
+
+        <div class="feature-card min-h-[320px] flex flex-col">
+          <div class="grid grid-cols-7 gap-1 mb-auto pt-4">
+            <div class="text-center font-mono text-[0.6rem] uppercase tracking-widest text-brand-text/40 mb-2">Tml</div>
+            <div class="text-center font-mono text-[0.6rem] uppercase tracking-widest text-brand-text/40 mb-2">Kab</div>
+            <div class="text-center font-mono text-[0.6rem] uppercase tracking-widest text-brand-text/40 mb-2">Çat</div>
+            <div class="text-center font-mono text-[0.6rem] uppercase tracking-widest text-brand-text/40 mb-2">İnc</div>
+            <div class="text-center font-mono text-[0.6rem] uppercase tracking-widest text-brand-text/40 mb-2">Dış</div>
+            <div class="text-center font-mono text-[0.6rem] uppercase tracking-widest text-brand-text/40 mb-2">İsk</div>
+            <div class="text-center font-mono text-[0.6rem] uppercase tracking-widest text-brand-text/40 mb-2">Tsl</div>
+            <div class="h-9 rounded-[4px] bg-brand-text/5 grid-cell highlight"></div>
+            <div class="h-9 rounded-[4px] bg-brand-text/5 grid-cell highlight"></div>
+            <div class="h-9 rounded-[4px] bg-brand-text/5 grid-cell"></div>
+            <div class="h-9 rounded-[4px] bg-brand-text/5 grid-cell highlight"></div>
+            <div class="h-9 rounded-[4px] bg-brand-text/5 grid-cell"></div>
+            <div class="h-9 rounded-[4px] bg-brand-text/5 grid-cell highlight"></div>
+            <div class="h-9 rounded-[4px] bg-brand-text/5 grid-cell highlight"></div>
+          </div>
+          <h3 class="font-heading font-bold text-xl mt-8 mb-2">İnşaat Boyunca Takip</h3>
+          <p class="font-body text-sm text-brand-text/70">Teminat, projenin başından iskâna kadar her hakediş aşamasında aktif kalır.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== NEDİR ===================== -->
+  <section id="nedir" class="py-24 px-6 bg-brand-surface border-y border-brand-text/10">
+    <div class="max-w-5xl mx-auto">
+      <div class="grid md:grid-cols-2 gap-12 items-start">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-widest text-brand-accent">Tanım</span>
+          <h2 class="font-heading font-bold text-3xl md:text-5xl mt-3 tracking-tight leading-tight">Bina Tamamlama Sigortası nedir?</h2>
+        </div>
+        <div class="font-body text-brand-text/75 leading-relaxed space-y-4 text-base md:text-lg">
+          <p>Bina Tamamlama Sigortası, bir inşaat projesinde müteahhidin sözleşmedeki yükümlülüğünü yerine getirememesi durumunda devreye giren bir teminattır.</p>
+          <p>Müteahhit iflas eder, projeyi terk eder ya da finansal nedenlerle inşaatı durdurursa; sigorta, binanın tamamlanmasını veya mülk sahiplerinin zararının teminat tutarı kapsamında karşılanmasını sağlar.</p>
+          <p>Özellikle <strong>kentsel dönüşüm</strong> ve <strong>kat karşılığı</strong> projelerde, mülk sahibi tek varlığını yıkıp müteahhide teslim ettiği için, bu sigorta tarafların güvenini kuran köprüdür.</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 mt-16">
+        <div class="rounded-card border border-brand-text/10 p-8 bg-brand-bg">
+          <div class="flex items-center gap-3 mb-5"><div class="w-10 h-10 rounded-xl bg-brand-text/5 flex items-center justify-center"><i data-lucide="alert-triangle" class="w-5 h-5 text-brand-text/50"></i></div><h3 class="font-heading font-bold text-lg">Sigorta Olmadan</h3></div>
+          <ul class="space-y-3 font-body text-sm text-brand-text/65">
+            <li class="flex gap-3"><i data-lucide="x" class="w-4 h-4 text-brand-text/40 shrink-0 mt-0.5"></i> Müteahhit iflas ederse yıllarca süren davalar.</li>
+            <li class="flex gap-3"><i data-lucide="x" class="w-4 h-4 text-brand-text/40 shrink-0 mt-0.5"></i> Yarım kalan inşaat, hak kaybı riski.</li>
+            <li class="flex gap-3"><i data-lucide="x" class="w-4 h-4 text-brand-text/40 shrink-0 mt-0.5"></i> Mülk sahiplerini ikna etmek zorlaşır.</li>
+            <li class="flex gap-3"><i data-lucide="x" class="w-4 h-4 text-brand-text/40 shrink-0 mt-0.5"></i> Belirsizlik ve güven eksikliği.</li>
+          </ul>
+        </div>
+        <div class="rounded-card border-2 border-brand-accent/40 p-8 bg-brand-surface relative overflow-hidden">
+          <span class="absolute top-5 right-5 font-mono text-[0.6rem] uppercase tracking-widest bg-brand-accent text-white px-3 py-1 rounded-pill">Önerilen</span>
+          <div class="flex items-center gap-3 mb-5"><div class="w-10 h-10 rounded-xl bg-brand-accent/10 flex items-center justify-center"><i data-lucide="shield-check" class="w-5 h-5 text-brand-accent"></i></div><h3 class="font-heading font-bold text-lg">Sigorta İle</h3></div>
+          <ul class="space-y-3 font-body text-sm text-brand-text/75">
+            <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-brand-accent shrink-0 mt-0.5"></i> Risk gerçekleşirse bina tamamlanır.</li>
+            <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-brand-accent shrink-0 mt-0.5"></i> Teminat tutarınca finansal koruma.</li>
+            <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-brand-accent shrink-0 mt-0.5"></i> Mülk sahipleri sözleşmeye daha kolay imza atar.</li>
+            <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-brand-accent shrink-0 mt-0.5"></i> Müteahhide ciddiyet ve itibar kazandırır.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PHILOSOPHY ===================== -->
+  <section class="philosophy-section relative py-32 px-6 bg-brand-text overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-20"><img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600&q=80" alt="" class="w-full h-full object-cover"></div>
+    <div class="relative z-10 max-w-4xl mx-auto text-center">
+      <p class="font-mono text-sm text-white/50 mb-6">Çoğu kentsel dönüşüm projesi şuna bel bağlar:</p>
+      <p class="font-heading text-2xl md:text-3xl text-white/70 mb-12">"Müteahhide güveniyoruz, bir şey olmaz."</p>
+      <p class="font-heading text-xl md:text-2xl text-white/80 mb-4">Biz ise güveni</p>
+      <p class="font-drama italic text-5xl md:text-7xl text-white leading-tight">teminata bağlarız.</p>
+    </div>
+  </section>
+
+  <!-- ===================== SÜREÇ ===================== -->
+  <section id="surec" class="py-24 px-6 bg-brand-bg">
+    <div class="max-w-4xl mx-auto">
+      <span class="font-mono text-xs uppercase tracking-widest text-brand-accent">Süreç</span>
+      <h2 class="font-heading font-bold text-3xl md:text-5xl mt-3 mb-16 tracking-tight">Nasıl çalışır?</h2>
+      <div class="timeline ml-8 pl-8 space-y-14">
+        <div class="relative process-step">
+          <div class="absolute -left-[2.65rem] w-5 h-5 rounded-full bg-brand-accent border-4 border-brand-bg"></div>
+          <span class="font-mono text-sm text-brand-accent">01</span>
+          <h3 class="font-heading font-bold text-xl md:text-2xl mt-2">Başvuru ve Bilgi Toplama</h3>
+          <p class="font-body text-brand-text/65 mt-2 leading-relaxed">Başvuru panelindeki 4 adımlı formla proje, riziko, taraf ve belge bilgileri toplanır.</p>
+        </div>
+        <div class="relative process-step">
+          <div class="absolute -left-[2.65rem] w-5 h-5 rounded-full bg-brand-accent border-4 border-brand-bg"></div>
+          <span class="font-mono text-sm text-brand-accent">02</span>
+          <h3 class="font-heading font-bold text-xl md:text-2xl mt-2">Risk Değerlendirmesi</h3>
+          <p class="font-body text-brand-text/65 mt-2 leading-relaxed">Lisanslı sigorta şirketi müteahhidin mali durumunu, sözleşmeyi, ruhsatı ve maliyeti inceleyerek risk analizini yapar.</p>
+        </div>
+        <div class="relative process-step">
+          <div class="absolute -left-[2.65rem] w-5 h-5 rounded-full bg-brand-accent border-4 border-brand-bg"></div>
+          <span class="font-mono text-sm text-brand-accent">03</span>
+          <h3 class="font-heading font-bold text-xl md:text-2xl mt-2">Teklif ve Poliçe</h3>
+          <p class="font-body text-brand-text/65 mt-2 leading-relaxed">Teminat tutarı, süre ve prim belirlenir. Taraflar onaylar, poliçe düzenlenir ve teminat yürürlüğe girer.</p>
+        </div>
+        <div class="relative process-step">
+          <div class="absolute -left-[2.65rem] w-5 h-5 rounded-full bg-brand-accent border-4 border-brand-bg"></div>
+          <span class="font-mono text-sm text-brand-accent">04</span>
+          <h3 class="font-heading font-bold text-xl md:text-2xl mt-2">İnşaat Boyunca Teminat</h3>
+          <p class="font-body text-brand-text/65 mt-2 leading-relaxed">İnşaat ilerledikçe teminat devam eder. Müteahhit yükümlülüğünü yerine getiremezse sigorta devreye girer.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FAYDALAR ===================== -->
+  <section id="faydalar" class="py-24 px-6 bg-brand-surface border-y border-brand-text/10">
+    <div class="max-w-6xl mx-auto">
+      <span class="font-mono text-xs uppercase tracking-widest text-brand-accent">Kazançlar</span>
+      <h2 class="font-heading font-bold text-3xl md:text-5xl mt-3 mb-4 tracking-tight">İki taraf da kazanır.</h2>
+      <p class="font-body text-brand-text/60 max-w-xl mb-16">Bina Tamamlama Sigortası tek taraflı bir koruma değil. Hem mülk sahibinin geleceğini hem müteahhidin itibarını güçlendirir.</p>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="rounded-card border border-brand-text/10 p-8 md:p-10 bg-brand-bg">
+          <div class="flex items-center gap-3 mb-6"><div class="w-12 h-12 rounded-xl bg-brand-accent/10 flex items-center justify-center"><i data-lucide="home" class="w-6 h-6 text-brand-accent"></i></div><div><h3 class="font-heading font-bold text-2xl">Mülk Sahibi İçin</h3><p class="font-mono text-xs text-brand-text/50 uppercase tracking-widest">Bina Sakinleri</p></div></div>
+          <ul class="space-y-4 font-body text-brand-text/75">
+            <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-accent shrink-0 mt-0.5"></i><span>Eviniz yarıda kalmaz; risk gerçekleşse bile bina tamamlanır.</span></li>
+            <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-accent shrink-0 mt-0.5"></i><span>Tek varlığınız olan konutunuz teminat tutarınca güvende.</span></li>
+            <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-accent shrink-0 mt-0.5"></i><span>Yıllarca sürecek dava ve mağduriyet riskinden korunursunuz.</span></li>
+            <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-accent shrink-0 mt-0.5"></i><span>Sözleşmeyi gönül rahatlığıyla imzalarsınız.</span></li>
+          </ul>
+          <button type="button" data-target="owner" class="benefit-cta inline-flex items-center gap-2 mt-8 bg-brand-text text-white px-6 py-3 rounded-pill font-heading font-semibold text-sm magnetic-btn">Mülk Sahibi Teklifi Al <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+        </div>
+        <div class="rounded-card border border-brand-text/10 p-8 md:p-10 bg-brand-bg">
+          <div class="flex items-center gap-3 mb-6"><div class="w-12 h-12 rounded-xl bg-brand-accent/10 flex items-center justify-center"><i data-lucide="hard-hat" class="w-6 h-6 text-brand-accent"></i></div><div><h3 class="font-heading font-bold text-2xl">Müteahhit İçin</h3><p class="font-mono text-xs text-brand-text/50 uppercase tracking-widest">İnşaat Firmaları</p></div></div>
+          <ul class="space-y-4 font-body text-brand-text/75">
+            <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-accent shrink-0 mt-0.5"></i><span>Mülk sahiplerini ikna etmek kolaylaşır; imza süreci hızlanır.</span></li>
+            <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-accent shrink-0 mt-0.5"></i><span>Finansal ciddiyetinizi ve güvenilirliğinizi belgelemiş olursunuz.</span></li>
+            <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-accent shrink-0 mt-0.5"></i><span>Rakiplerinizden ayrışan güçlü bir rekabet avantajı.</span></li>
+            <li class="flex gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-brand-accent shrink-0 mt-0.5"></i><span>Projeye finansman ve kurumsal itibar desteği sağlar.</span></li>
+          </ul>
+          <button type="button" data-target="contractor" class="benefit-cta inline-flex items-center gap-2 mt-8 bg-brand-text text-white px-6 py-3 rounded-pill font-heading font-semibold text-sm magnetic-btn">Müteahhit Teklifi Al <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BAŞVURU PANELİ (4 ADIMLI WIZARD) ===================== -->
+  <section id="basvuru" class="py-24 px-6 bg-brand-bg">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-10">
+        <span class="font-mono text-xs uppercase tracking-widest text-brand-accent">Başvuru Paneli</span>
+        <h2 class="font-heading font-bold text-3xl md:text-5xl mt-3 tracking-tight">Poliçe teklifinizi alın</h2>
+        <p class="font-body text-brand-text/60 mt-4 max-w-xl mx-auto">4 adımda bilgilerinizi girin ve belgeleri ekleyin. Uzmanlarımız 48 saat içinde ön teklifinizle döner. Başvuru ücretsiz ve bağlayıcı değildir.</p>
+      </div>
+
+      <!-- Step indicator -->
+      <div id="step-indicator" class="flex items-center gap-2 max-w-xl mx-auto mb-10">
+        <div class="flex flex-col items-center gap-1"><div class="step-dot active" data-dot="1">1</div><span class="font-mono text-[0.6rem] uppercase tracking-widest text-brand-text/50 hidden sm:block">Sigorta</span></div>
+        <div class="step-bar" data-bar="1"></div>
+        <div class="flex flex-col items-center gap-1"><div class="step-dot" data-dot="2">2</div><span class="font-mono text-[0.6rem] uppercase tracking-widest text-brand-text/50 hidden sm:block">Riziko</span></div>
+        <div class="step-bar" data-bar="2"></div>
+        <div class="flex flex-col items-center gap-1"><div class="step-dot" data-dot="3">3</div><span class="font-mono text-[0.6rem] uppercase tracking-widest text-brand-text/50 hidden sm:block">Taraflar</span></div>
+        <div class="step-bar" data-bar="3"></div>
+        <div class="flex flex-col items-center gap-1"><div class="step-dot" data-dot="4">4</div><span class="font-mono text-[0.6rem] uppercase tracking-widest text-brand-text/50 hidden sm:block">Belge & Onay</span></div>
+      </div>
+
+      <!-- Success -->
+      <div id="form-success" class="hidden rounded-card border border-brand-accent/40 bg-brand-surface p-10 text-center">
+        <div class="w-14 h-14 rounded-full bg-brand-accent/10 flex items-center justify-center mx-auto mb-5"><i data-lucide="check" class="w-7 h-7 text-brand-accent"></i></div>
+        <h3 class="font-heading font-bold text-2xl mb-2">Başvurunuz alındı</h3>
+        <p class="font-body text-brand-text/65">Teşekkürler. Uzmanlarımız bilgilerinizi değerlendirip 48 saat içinde ön teklifinizle iletişime geçecek.</p>
+      </div>
+
+      <form id="quote-wizard" name="teklif-talebi" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data" class="rounded-card border border-brand-text/10 bg-brand-surface p-6 md:p-10" novalidate>
+        <!-- Netlify Forms: form algılaması için gerekli gizli alan -->
+        <input type="hidden" name="form-name" value="teklif-talebi">
+        <p class="hidden"><label>Bu alanı boş bırakın: <input name="bot-field"></label></p>
+
+        <!-- ===== ADIM 1: SİGORTA & PROJE ===== -->
+        <div class="wizard-step active" data-step="1">
+          <div class="group-title"><span class="group-num">01</span><h4>Sigortanın Konusu</h4></div>
+          <div class="grid sm:grid-cols-3 gap-3 mb-8">
+            <label class="subject-card"><input type="radio" name="sigorta_konusu" value="Kentsel Dönüşüm (6306)" checked>
+              <div class="flex items-center gap-2 mb-1"><i data-lucide="building-2" class="w-4 h-4 text-brand-accent"></i><span class="font-heading font-semibold text-sm">Kentsel Dönüşüm</span></div>
+              <p class="font-mono text-[0.65rem] text-brand-text/50">6306 sayılı kanun kapsamı</p>
+            </label>
+            <label class="subject-card"><input type="radio" name="sigorta_konusu" value="Ön Ödemeli Konut (6502)">
+              <div class="flex items-center gap-2 mb-1"><i data-lucide="home" class="w-4 h-4 text-brand-accent"></i><span class="font-heading font-semibold text-sm">Ön Ödemeli Konut</span></div>
+              <p class="font-mono text-[0.65rem] text-brand-text/50">6502 sayılı kanun kapsamı</p>
+            </label>
+            <label class="subject-card"><input type="radio" name="sigorta_konusu" value="Serbest Yapılar">
+              <div class="flex items-center gap-2 mb-1"><i data-lucide="layers" class="w-4 h-4 text-brand-accent"></i><span class="font-heading font-semibold text-sm">Serbest Yapılar</span></div>
+              <p class="font-mono text-[0.65rem] text-brand-text/50">Diğer inşaat projeleri</p>
+            </label>
+          </div>
+
+          <div class="group-title"><span class="group-num">02</span><h4>Başvuran Rolü</h4></div>
+          <div class="flex flex-wrap gap-3 mb-8">
+            <label class="role-pill"><input type="radio" name="rol" value="Mülk Sahibi / Borçlu" checked><i data-lucide="home" class="w-4 h-4"></i> Mülk Sahibi</label>
+            <label class="role-pill"><input type="radio" name="rol" value="Müteahhit"><i data-lucide="hard-hat" class="w-4 h-4"></i> Müteahhit</label>
+            <label class="role-pill"><input type="radio" name="rol" value="Acente / Temsilci"><i data-lucide="briefcase" class="w-4 h-4"></i> Acente / Temsilci</label>
+          </div>
+
+          <div class="group-title"><span class="group-num">03</span><h4>Proje Bilgileri</h4></div>
+          <div class="grid md:grid-cols-2 gap-5">
+            <div class="md:col-span-2"><label class="field-label">Proje Adı / Unvanı <span class="req">*</span></label><input required name="proje_adi" type="text" class="field" placeholder="Örn. Kadıköy Kentsel Dönüşüm Projesi"></div>
+            <div>
+              <label class="field-label">Proje Bedeli <span class="req">*</span></label>
+              <div class="flex gap-2">
+                <input required name="proje_bedeli" type="text" class="field" placeholder="Örn. 250.000.000">
+                <select name="para_birimi" class="field" style="width:5rem;"><option>₺</option><option>$</option><option>€</option><option>£</option></select>
+              </div>
+            </div>
+            <div><label class="field-label">Proje Başlangıç Tarihi</label><input name="proje_baslangic" type="date" class="field"></div>
+            <div><label class="field-label">Bina Tamamlama (Bitiş) Tarihi</label><input name="proje_bitis" type="date" class="field"></div>
+            <div><label class="field-label">Tahmini İnşaat Süresi (Ay)</label><input name="sure_ay" type="number" min="1" class="field" placeholder="Örn. 24"></div>
+          </div>
+        </div>
+
+        <!-- ===== ADIM 2: RİZİKO & ADRES ===== -->
+        <div class="wizard-step" data-step="2">
+          <div class="group-title"><span class="group-num">04</span><h4>Yapı Özellikleri</h4></div>
+          <div class="grid md:grid-cols-2 gap-5 mb-8">
+            <div>
+              <label class="field-label">Yapı Tarzı</label>
+              <select name="yapi_tarzi" class="field"><option value="">Seçiniz</option><option>Çelik / Betonarme</option><option>Yığma Kâgir</option><option>Ahşap</option><option>Diğer</option></select>
+            </div>
+            <div>
+              <label class="field-label">Riziko Türü</label>
+              <select name="riziko_turu" class="field"><option value="">Seçiniz</option><option>Konut</option><option>Ticari</option><option>Karma (Konut + Ticari)</option></select>
+            </div>
+          </div>
+
+          <div class="group-title"><span class="group-num">05</span><h4>Noter / Sözleşme Bilgileri</h4></div>
+          <div class="grid md:grid-cols-3 gap-5 mb-8">
+            <div><label class="field-label">Noter Adı</label><input name="noter_adi" type="text" class="field" placeholder="Örn. Kadıköy 5. Noteri"></div>
+            <div><label class="field-label">Sözleşme Tarihi</label><input name="sozlesme_tarihi" type="date" class="field"></div>
+            <div><label class="field-label">Yevmiye No</label><input name="yevmiye_no" type="text" class="field" placeholder="Örn. 12345"></div>
+          </div>
+
+          <div class="group-title"><span class="group-num">06</span><h4>Alan Ölçümleri (m²)</h4></div>
+          <div class="grid md:grid-cols-3 gap-5 mb-8">
+            <div><label class="field-label">Toplam Konut Brüt Alanı</label><input name="m2_konut" type="number" min="0" class="field" placeholder="m²"></div>
+            <div><label class="field-label">Toplam İşyeri Brüt Alanı</label><input name="m2_isyeri" type="number" min="0" class="field" placeholder="m²"></div>
+            <div><label class="field-label">Eklenti Alanı</label><input name="m2_eklenti" type="number" min="0" class="field" placeholder="m²"></div>
+            <div><label class="field-label">Ortak Yerler Brüt Alanı</label><input name="m2_ortak" type="number" min="0" class="field" placeholder="m²"></div>
+            <div><label class="field-label">Toplam Arsa Sahipleri Alanı</label><input name="m2_arsa_sahipleri" type="number" min="0" class="field" placeholder="m²"></div>
+            <div><label class="field-label">Toplam İnşaat Alanı <span class="req">*</span></label><input required name="m2_toplam" type="number" min="0" class="field" placeholder="m²"></div>
+          </div>
+
+          <div class="group-title"><span class="group-num">07</span><h4>Riziko Adresi</h4></div>
+          <div class="grid md:grid-cols-2 gap-5">
+            <div><label class="field-label">İl <span class="req">*</span></label><input required name="il" type="text" class="field" placeholder="Örn. İstanbul"></div>
+            <div><label class="field-label">İlçe <span class="req">*</span></label><input required name="ilce" type="text" class="field" placeholder="Örn. Kadıköy"></div>
+            <div><label class="field-label">Mahalle</label><input name="mahalle" type="text" class="field" placeholder="Örn. Caferağa"></div>
+            <div><label class="field-label">Cadde / Sokak</label><input name="cadde_sokak" type="text" class="field" placeholder="Örn. Moda Cad."></div>
+            <div><label class="field-label">Bina No</label><input name="bina_no" type="text" class="field" placeholder="Örn. 12"></div>
+            <div><label class="field-label">İç Kapı / Bağımsız Bölüm</label><input name="bb_no" type="text" class="field" placeholder="Örn. 5"></div>
+            <div><label class="field-label">UAVT Adres Kodu</label><input name="uavt" type="text" class="field" placeholder="10 haneli adres kodu"></div>
+            <div class="grid grid-cols-2 gap-3">
+              <div><label class="field-label">Ada</label><input name="ada" type="text" class="field" placeholder="Ada no"></div>
+              <div><label class="field-label">Parsel</label><input name="parsel" type="text" class="field" placeholder="Parsel no"></div>
+            </div>
+            <div><label class="field-label">Toplam Bağımsız Bölüm Sayısı</label><input name="bb_sayisi" type="number" min="1" class="field" placeholder="Örn. 48"></div>
+          </div>
+        </div>
+
+        <!-- ===== ADIM 3: TARAFLAR ===== -->
+        <div class="wizard-step" data-step="3">
+          <div class="group-title"><span class="group-num">08</span><h4>Borçlu / Sigortalı Bilgileri</h4></div>
+          <p class="font-body text-xs text-brand-text/50 -mt-2 mb-5">Lehine teminat verilen taraf (genellikle mülk sahibi / arsa sahibi).</p>
+          <div class="grid md:grid-cols-2 gap-5 mb-8">
+            <div><label class="field-label">T.C. / Vergi Kimlik No <span class="req">*</span></label><input required name="sig_tckn" type="text" class="field" placeholder="11 veya 10 haneli"></div>
+            <div><label class="field-label">Doğum Tarihi</label><input name="sig_dogum" type="date" class="field"></div>
+            <div><label class="field-label">Ad Soyad / Unvan <span class="req">*</span></label><input required name="sig_ad" type="text" class="field" placeholder="Ad Soyad ya da firma unvanı"></div>
+            <div><label class="field-label">Cep Telefonu <span class="req">*</span></label><input required name="sig_telefon" type="tel" class="field" placeholder="05XX XXX XX XX"></div>
+            <div><label class="field-label">E-posta <span class="req">*</span></label><input required name="sig_eposta" type="email" class="field" placeholder="ornek@eposta.com"></div>
+            <div><label class="field-label">İl / İlçe</label><input name="sig_il_ilce" type="text" class="field" placeholder="İstanbul / Kadıköy"></div>
+            <div class="md:col-span-2"><label class="field-label">Adres</label><input name="sig_adres" type="text" class="field" placeholder="Açık adres"></div>
+          </div>
+
+          <div class="group-title"><span class="group-num">09</span><h4>Sigorta Ettiren</h4></div>
+          <label class="same-toggle flex items-center gap-3 mb-5 cursor-pointer">
+            <input type="checkbox" id="same-person" name="ettiren_ayni" value="Evet" checked>
+            <span class="w-10 h-6 rounded-full bg-brand-text/15 relative transition-colors duration-300 toggle-track">
+              <span class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-300 toggle-knob"></span>
+            </span>
+            <span class="font-body text-sm text-brand-text/75">Sigorta ettiren, borçlu/sigortalı ile aynı kişi</span>
+          </label>
+          <div id="ettiren-fields" class="grid md:grid-cols-2 gap-5 mb-8" style="display:none;">
+            <div><label class="field-label">T.C. / Vergi Kimlik No</label><input name="ett_tckn" type="text" class="field" placeholder="11 veya 10 haneli"></div>
+            <div><label class="field-label">Doğum Tarihi</label><input name="ett_dogum" type="date" class="field"></div>
+            <div><label class="field-label">Ad Soyad / Unvan</label><input name="ett_ad" type="text" class="field" placeholder="Ad Soyad ya da firma unvanı"></div>
+            <div><label class="field-label">Telefon</label><input name="ett_telefon" type="tel" class="field" placeholder="05XX XXX XX XX"></div>
+            <div><label class="field-label">E-posta</label><input name="ett_eposta" type="email" class="field" placeholder="ornek@eposta.com"></div>
+            <div><label class="field-label">İl / İlçe</label><input name="ett_il_ilce" type="text" class="field" placeholder="İstanbul / Kadıköy"></div>
+          </div>
+
+          <div class="group-title"><span class="group-num">10</span><h4>Talepte Bulunan</h4></div>
+          <p class="font-body text-xs text-brand-text/50 -mt-2 mb-5">Bu başvuruyu yapan kişi. Sizinle iletişim için kullanılır.</p>
+          <div class="grid md:grid-cols-2 gap-5">
+            <div><label class="field-label">Ad Soyad / Unvan <span class="req">*</span></label><input required name="talep_ad" type="text" class="field" placeholder="Ad Soyad"></div>
+            <div><label class="field-label">Telefon <span class="req">*</span></label><input required name="talep_telefon" type="tel" class="field" placeholder="05XX XXX XX XX"></div>
+            <div><label class="field-label">E-posta <span class="req">*</span></label><input required name="talep_eposta" type="email" class="field" placeholder="ornek@eposta.com"></div>
+            <div><label class="field-label">Çalıştığınız Acente (varsa)</label><input name="talep_acente" type="text" class="field" placeholder="Acente adı / unvanı"></div>
+          </div>
+        </div>
+
+        <!-- ===== ADIM 4: BELGELER & ONAY ===== -->
+        <div class="wizard-step" data-step="4">
+          <div class="group-title"><span class="group-num">11</span><h4>Gerekli Belgeler</h4></div>
+          <p class="font-body text-xs text-brand-text/50 -mt-2 mb-5">Belgeleri şimdi ekleyebilir ya da başvuru sonrası uzmanımıza iletebilirsiniz.</p>
+          <div class="grid sm:grid-cols-2 gap-2 mb-5 font-body text-sm text-brand-text/70">
+            <span class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-brand-accent"></i> Kat Karşılığı / Müteahhit Sözleşmesi</span>
+            <span class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-brand-accent"></i> Tapu</span>
+            <span class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-brand-accent"></i> İnşaat Ruhsatı</span>
+            <span class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-brand-accent"></i> Metrekare Cetveli</span>
+            <span class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-brand-accent"></i> Onaylı Proje</span>
+            <span class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-brand-accent"></i> Ticaret Sicil Gazetesi / Faaliyet Belgesi</span>
+            <span class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-brand-accent"></i> Vergi Levhası / İmza Sirküleri</span>
+            <span class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-brand-accent"></i> Kimlik Belgesi</span>
+          </div>
+          <label class="dropzone flex flex-col items-center justify-center gap-2 py-8 px-4 text-center mb-8">
+            <i data-lucide="upload-cloud" class="w-7 h-7 text-brand-text/40"></i>
+            <span class="font-heading text-sm font-medium">Belgeleri buraya yükleyin</span>
+            <span class="font-mono text-xs text-brand-text/40">PDF, JPG veya PNG · Birden fazla dosya seçebilirsiniz</span>
+            <input type="file" name="belgeler" multiple accept=".pdf,.jpg,.jpeg,.png" class="hidden file-input">
+            <span class="file-list font-mono text-xs text-brand-accent mt-1"></span>
+          </label>
+
+          <div class="group-title"><span class="group-num">12</span><h4>Proje Hakkında Not</h4></div>
+          <textarea name="not" rows="3" class="field mb-8" placeholder="Proje ve teminat beklentinizle ilgili eklemek istedikleriniz"></textarea>
+
+          <div class="group-title"><span class="group-num">13</span><h4>Onaylar</h4></div>
+          <div class="space-y-4">
+            <label class="flex items-start gap-3 font-body text-sm text-brand-text/70">
+              <input required type="checkbox" name="sozlesme_onay" value="Onaylandı" class="mt-1 accent-[#E63B2E]">
+              <span><button type="button" class="doc-link" data-doc="gizlilik">Gizlilik Politikası</button>, <button type="button" class="doc-link" data-doc="sozlesme">Kullanıcı Sözleşmesi</button> ve <button type="button" class="doc-link" data-doc="police">Poliçe Bilgilendirme Formu</button>'nu okudum ve kabul ediyorum. <span class="req">*</span></span>
+            </label>
+            <label class="flex items-start gap-3 font-body text-sm text-brand-text/70">
+              <input required type="checkbox" name="kvkk_onay" value="Onaylandı" class="mt-1 accent-[#E63B2E]">
+              <span><button type="button" class="doc-link" data-doc="kvkk">KVKK Aydınlatma Metni</button>'ni okudum ve kabul ediyorum. <span class="req">*</span></span>
+            </label>
+            <label class="flex items-start gap-3 font-body text-sm text-brand-text/70">
+              <input type="checkbox" name="acik_riza" value="Rıza verildi" class="mt-1 accent-[#E63B2E]">
+              <span><button type="button" class="doc-link" data-doc="riza">Açık Rıza Metni</button> kapsamında kişisel verilerimin işlenmesine rıza gösteriyorum. <span class="font-mono text-[0.65rem] text-brand-text/40 uppercase tracking-widest">(İsteğe bağlı)</span></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex items-center justify-between gap-4 mt-10 pt-6 border-t border-brand-text/10">
+          <button type="button" id="btn-prev" class="inline-flex items-center gap-2 px-6 py-3 rounded-pill font-heading font-semibold text-sm border border-brand-text/15 text-brand-text/70 magnetic-btn invisible">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Geri
+          </button>
+          <span class="font-mono text-xs text-brand-text/40"><span id="step-label">Adım 1</span> / 4</span>
+          <button type="button" id="btn-next" class="inline-flex items-center gap-2 bg-brand-accent text-white px-7 py-3 rounded-pill font-heading font-semibold text-sm magnetic-btn">
+            İleri <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+          <button type="submit" id="btn-submit" class="hidden items-center gap-2 bg-brand-accent text-white px-7 py-3 rounded-pill font-heading font-semibold text-sm magnetic-btn">
+            <span class="btn-label">Teklif Talebini Gönder</span> <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </form>
+      <p class="text-xs font-mono text-brand-text/30 text-center mt-4">Başvurunuz ücretsizdir, sizi bağlamaz. Ödeme ve poliçe işlemleri yetkili acente üzerinden yürütülür.</p>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="bg-brand-text text-brand-bg/80 rounded-t-[3rem] md:rounded-t-[4rem] pt-16 pb-8 px-6">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-5 gap-12 mb-16">
+      <div class="md:col-span-2">
+        <h3 class="font-heading font-bold text-xl text-white mb-4 flex items-center gap-2"><span class="inline-block w-2.5 h-2.5 bg-brand-accent rounded-sm"></span>BinaGüvence</h3>
+        <p class="font-body text-sm opacity-60 max-w-sm leading-relaxed">Kentsel dönüşüm projelerinde Bina Tamamlama Sigortası danışmanlığı. Mülk sahibinin geleceğini, müteahhidin itibarını teminat altına alıyoruz.</p>
+      </div>
+      <div>
+        <h4 class="font-mono text-xs uppercase tracking-widest opacity-40 mb-4">Sayfalar</h4>
+        <ul class="space-y-2 font-body text-sm">
+          <li><a href="#nedir" class="opacity-70 hover:opacity-100 transition-opacity">Sigorta Nedir?</a></li>
+          <li><a href="#surec" class="opacity-70 hover:opacity-100 transition-opacity">Nasıl Çalışır</a></li>
+          <li><a href="#faydalar" class="opacity-70 hover:opacity-100 transition-opacity">Faydalar</a></li>
+          <li><a href="#basvuru" class="opacity-70 hover:opacity-100 transition-opacity">Teklif Al</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-mono text-xs uppercase tracking-widest opacity-40 mb-4">Yasal</h4>
+        <ul class="space-y-2 font-body text-sm">
+          <li><button type="button" class="doc-link opacity-70 hover:opacity-100 transition-opacity" style="color:inherit;text-decoration:none;font-weight:400;" data-doc="gizlilik">Gizlilik Politikası</button></li>
+          <li><button type="button" class="doc-link opacity-70 hover:opacity-100 transition-opacity" style="color:inherit;text-decoration:none;font-weight:400;" data-doc="sozlesme">Kullanıcı Sözleşmesi</button></li>
+          <li><button type="button" class="doc-link opacity-70 hover:opacity-100 transition-opacity" style="color:inherit;text-decoration:none;font-weight:400;" data-doc="police">Poliçe Bilgilendirme Formu</button></li>
+          <li><button type="button" class="doc-link opacity-70 hover:opacity-100 transition-opacity" style="color:inherit;text-decoration:none;font-weight:400;" data-doc="kvkk">KVKK Aydınlatma Metni</button></li>
+          <li><button type="button" class="doc-link opacity-70 hover:opacity-100 transition-opacity" style="color:inherit;text-decoration:none;font-weight:400;" data-doc="riza">Açık Rıza Metni</button></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-mono text-xs uppercase tracking-widest opacity-40 mb-4">İletişim</h4>
+        <ul class="space-y-2 font-body text-sm opacity-70">
+          <li class="flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i> <a href="tel:+905327865491" class="hover:opacity-100">0532 786 54 91</a></li>
+          <li class="flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i> info@binaguvence.com</li>
+          <li class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> İstanbul, Türkiye</li>
+        </ul>
+      </div>
+    </div>
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 border-t border-white/10 pt-6">
+      <p class="text-xs font-mono opacity-40 text-center">© 2026 BinaGüvence. Tüm hakları saklıdır. · Aracılık faaliyeti yetkili sigorta acentesi/brokeri tarafından yürütülür.</p>
+      <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span><span class="text-xs font-mono opacity-40">Başvurular Açık</span></div>
+    </div>
+  </footer>
+
+  <!-- ===================== FLOATING WHATSAPP ===================== -->
+  <a href="https://wa.me/905327865491?text=Merhaba%2C%20Bina%20Tamamlama%20Sigortas%C4%B1%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum."
+     target="_blank" rel="noopener noreferrer" id="whatsapp-float"
+     class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#25D366] text-white pl-4 pr-5 py-3 rounded-pill shadow-lg font-heading font-semibold text-sm magnetic-btn">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.317 0-4.46-.758-6.194-2.04l-.432-.328-2.637.884.884-2.637-.328-.432A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+    </svg>
+    <span class="hidden sm:inline">Bilgi Al</span>
+  </a>
+
+  <!-- ===================== HUKUKİ METİN MODALI ===================== -->
+  <div id="doc-modal" aria-hidden="true">
+    <div class="doc-backdrop" data-close></div>
+    <div class="doc-panel" role="dialog" aria-modal="true" aria-labelledby="doc-title">
+      <div class="doc-head">
+        <h3 id="doc-title" class="font-heading font-bold text-lg md:text-xl"></h3>
+        <button type="button" data-close class="w-9 h-9 rounded-full bg-brand-bg flex items-center justify-center magnetic-btn shrink-0" aria-label="Kapat">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="doc-body" class="doc-body"></div>
+    </div>
+  </div>
+
+  <!-- ===================== METİN İÇERİKLERİ (TEMPLATE) ===================== -->
+  <template id="tpl-gizlilik">
+    <p class="meta">Son güncelleme: Haziran 2026</p>
+    <h4>1. Genel</h4>
+    <p>Bu Gizlilik Politikası, BinaGüvence ("Şirket") tarafından işletilen bu internet sitesini kullanan ve teklif başvurusunda bulunan kişilerin ("Kullanıcı") kişisel verilerinin nasıl toplandığını, kullanıldığını ve korunduğunu açıklar.</p>
+    <h4>2. Toplanan Veriler</h4>
+    <p>Başvuru paneli aracılığıyla; ad-soyad/unvan, T.C./vergi kimlik numarası, doğum tarihi, telefon, e-posta, adres, proje ve riziko bilgileri ile yüklediğiniz belgeler toplanır. Ayrıca site kullanımına ilişkin teknik veriler (IP, tarayıcı bilgisi) işlenebilir.</p>
+    <h4>3. Verilerin Kullanım Amaçları</h4>
+    <ul>
+      <li>Bina tamamlama sigortası teklifinizin hazırlanması ve değerlendirilmesi,</li>
+      <li>Sizinle iletişime geçilmesi ve başvurunuzun sonuçlandırılması,</li>
+      <li>Yetkili sigorta şirketi/acentesi ile poliçe sürecinin yürütülmesi,</li>
+      <li>Yasal yükümlülüklerin yerine getirilmesi.</li>
+    </ul>
+    <h4>4. Verilerin Aktarımı</h4>
+    <p>Verileriniz; teklif ve poliçe sürecinin yürütülebilmesi amacıyla yetkili sigorta şirketleri, acente/broker ve mevzuatın gerektirdiği kamu kurumları ile sınırlı olarak paylaşılabilir. Verileriniz pazarlama amacıyla üçüncü kişilere satılmaz.</p>
+    <h4>5. Saklama Süresi</h4>
+    <p>Kişisel verileriniz, işleme amacının gerektirdiği süre boyunca ve ilgili mevzuatta öngörülen zamanaşımı süreleri kadar saklanır; sürenin sonunda silinir, yok edilir veya anonim hale getirilir.</p>
+    <h4>6. Çerezler</h4>
+    <p>Site, temel işlevsellik ve kullanım deneyimini iyileştirmek için çerez kullanabilir. Tarayıcı ayarlarınızdan çerezleri yönetebilirsiniz.</p>
+    <h4>7. İletişim</h4>
+    <p>Sorularınız için: info@binaguvence.com · 0532 786 54 91</p>
+  </template>
+
+  <template id="tpl-sozlesme">
+    <p class="meta">Son güncelleme: Haziran 2026</p>
+    <h4>1. Taraflar ve Konu</h4>
+    <p>Bu Kullanıcı Sözleşmesi, BinaGüvence internet sitesini kullanan Kullanıcı ile Şirket arasındaki kullanım koşullarını düzenler. Siteyi kullanarak bu koşulları kabul etmiş sayılırsınız.</p>
+    <h4>2. Hizmetin Niteliği</h4>
+    <p>Site, bina tamamlama sigortası hakkında bilgilendirme yapar ve teklif talebi toplar. Başvuru panelinden yapılan başvuru bir <strong>teklif talebidir</strong>; tek başına poliçe akdi veya sigorta teminatı doğurmaz. Teminat ancak yetkili sigorta şirketince poliçe düzenlenmesiyle yürürlüğe girer.</p>
+    <h4>3. Kullanıcının Yükümlülükleri</h4>
+    <ul>
+      <li>Başvuruda verdiği bilgi ve belgelerin doğru, güncel ve kendisine ait olduğunu kabul eder,</li>
+      <li>Üçüncü kişilere ait verileri yalnızca gerekli izinlere sahip olarak paylaşır,</li>
+      <li>Siteyi hukuka aykırı amaçlarla kullanmayacağını taahhüt eder.</li>
+    </ul>
+    <h4>4. Sorumluluğun Sınırı</h4>
+    <p>Yanlış veya eksik bilgi nedeniyle oluşan teklif/değerlendirme hatalarından Şirket sorumlu tutulamaz. Site içeriği bilgilendirme amaçlıdır; nihai teminat koşulları poliçe ve ilgili mevzuat ile belirlenir.</p>
+    <h4>5. Fikri Mülkiyet</h4>
+    <p>Sitedeki tüm içerik, tasarım ve marka unsurları Şirket'e aittir; izinsiz kullanılamaz.</p>
+    <h4>6. Değişiklikler</h4>
+    <p>Şirket, bu sözleşmeyi güncelleme hakkını saklı tutar. Güncel metin sitede yayımlandığı an yürürlüğe girer.</p>
+  </template>
+
+  <template id="tpl-police">
+    <p class="meta">Sigortacılık mevzuatı uyarınca bilgilendirme</p>
+    <h4>1. Amaç</h4>
+    <p>Bu form, bina tamamlama sigortası ürünü hakkında sigorta ettiren/sigortalıyı sözleşme öncesinde bilgilendirmek amacıyla hazırlanmıştır. Nihai hak ve yükümlülükler düzenlenecek poliçe ve genel/özel şartlarda yer alır.</p>
+    <h4>2. Teminatın Konusu</h4>
+    <p>Bina tamamlama sigortası; müteahhidin sözleşmeden doğan yükümlülüğünü (iflas, projeyi terk, finansal yetersizlik vb. nedenlerle) yerine getirememesi halinde, poliçede belirtilen teminat tutarı ve şartlar çerçevesinde inşaatın tamamlanmasını veya zararın karşılanmasını kapsar.</p>
+    <h4>3. Tarafların Hak ve Yükümlülükleri</h4>
+    <ul>
+      <li>Sigorta ettiren, rizikoya ilişkin bilgileri doğru ve eksiksiz beyan etmekle yükümlüdür,</li>
+      <li>Beyan yükümlülüğüne aykırılık teminatı etkileyebilir,</li>
+      <li>Prim ödeme ve riziko gerçekleştiğinde bildirim yükümlülükleri poliçede belirtilir.</li>
+    </ul>
+    <h4>4. Teminat Dışı Haller</h4>
+    <p>Poliçe genel ve özel şartlarında belirtilen istisnalar (örneğin kasıtlı eylemler, mevzuata aykırı yapılar, beyan dışı değişiklikler) teminat kapsamı dışındadır.</p>
+    <h4>5. Şikâyet ve Başvuru</h4>
+    <p>Talep ve şikâyetlerinizi info@binaguvence.com veya 0532 786 54 91 üzerinden iletebilir; ayrıca Sigorta Tahkim Komisyonu ve yetkili kurumlara başvurabilirsiniz.</p>
+    <p class="meta">Bu form bilgilendirme amaçlıdır; sigorta sözleşmesi yerine geçmez.</p>
+  </template>
+
+  <template id="tpl-kvkk">
+    <p class="meta">6698 sayılı KVKK md. 10 uyarınca aydınlatma</p>
+    <h4>1. Veri Sorumlusu</h4>
+    <p>Kişisel verileriniz, veri sorumlusu sıfatıyla BinaGüvence tarafından aşağıda açıklanan kapsamda işlenmektedir. İletişim: info@binaguvence.com · 0532 786 54 91 · İstanbul.</p>
+    <h4>2. İşlenen Kişisel Veriler</h4>
+    <p>Kimlik (ad-soyad, T.C./vergi no, doğum tarihi), iletişim (telefon, e-posta, adres), proje ve riziko bilgileri ile yüklenen belgelerde yer alan veriler.</p>
+    <h4>3. İşleme Amaçları</h4>
+    <ul>
+      <li>Sigorta teklifinin hazırlanması ve risk değerlendirmesi,</li>
+      <li>Poliçe sürecinin yürütülmesi ve iletişim,</li>
+      <li>Hukuki yükümlülüklerin ve sözleşmesel süreçlerin yerine getirilmesi.</li>
+    </ul>
+    <h4>4. Hukuki Sebepler</h4>
+    <p>Veriler; bir sözleşmenin kurulması/ifası için gerekli olması, hukuki yükümlülük ve meşru menfaat (KVKK md. 5) hukuki sebeplerine dayanılarak işlenir. Zorunlu olmayan işlemeler açık rızanıza tabidir.</p>
+    <h4>5. Aktarım</h4>
+    <p>Veriler; yetkili sigorta şirketleri, acente/broker ve mevzuatın zorunlu kıldığı kamu kurumlarına KVKK md. 8 çerçevesinde aktarılabilir.</p>
+    <h4>6. Haklarınız (KVKK md. 11)</h4>
+    <p>Verilerinizin işlenip işlenmediğini öğrenme, bilgi talep etme, düzeltilmesini/silinmesini isteme, işlemeye itiraz etme ve zararın giderilmesini talep etme haklarına sahipsiniz. Başvurularınızı yukarıdaki iletişim kanallarından iletebilirsiniz.</p>
+  </template>
+
+  <template id="tpl-riza">
+    <p class="meta">İsteğe bağlı — özgür irade ile verilir</p>
+    <h4>Açık Rıza Beyanı</h4>
+    <p>KVKK Aydınlatma Metni'ni okuduğumu; teklif ve poliçe sürecinin yürütülmesi için zorunlu olan işlemeler dışında, aşağıdaki amaçlarla kişisel verilerimin işlenmesine ve aktarılmasına <strong>açık rıza</strong> gösterdiğimi beyan ederim:</p>
+    <ul>
+      <li>Bana özel kampanya, fırsat ve sigorta ürünlerine ilişkin tanıtım/bilgilendirme yapılması,</li>
+      <li>Telefon, SMS ve e-posta yoluyla ticari elektronik ileti gönderilmesi,</li>
+      <li>Hizmet kalitesinin geliştirilmesi amacıyla anket ve memnuniyet çalışmaları yapılması.</li>
+    </ul>
+    <p>Bu rıza isteğe bağlıdır ve dilediğim zaman info@binaguvence.com üzerinden geri çekebilirim. Rıza vermemem, teklif başvurumun değerlendirilmesine engel değildir.</p>
+  </template>
+
+  <!-- ===================== SCRIPTS ===================== -->
+  <script>
+    // ---- Form altyapısı: Netlify Forms ----
+    // Site Netlify'a deploy edilince form otomatik çalışır; ekstra ayar gerekmez.
+    // Gönderimler Netlify panelinde "Forms > teklif-talebi" altında görünür.
+    // (Yerelde dosyayı çift tıklayıp açtığınızda demo modunda çalışır, veri gönderilmez.)
+    // ---------------------------------------------------------------------------
+
+    lucide.createIcons();
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      heroTl
+        .from('.hero-badge', { y: 20, opacity: 0, duration: 0.6 })
+        .from('.hero-line-1', { y: 40, opacity: 0, duration: 0.8 }, '-=0.2')
+        .from('.hero-line-2', { y: 60, opacity: 0, duration: 1 }, '-=0.4')
+        .from('.hero-subtitle', { y: 30, opacity: 0, duration: 0.6 }, '-=0.5')
+        .from('.hero-cta', { y: 20, opacity: 0, duration: 0.5 }, '-=0.3')
+        .from('.hero-stats > *', { y: 20, opacity: 0, stagger: 0.1, duration: 0.4 }, '-=0.2');
+
+      gsap.from('.feature-card', { y: 60, opacity: 0, stagger: 0.15, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: '#ozellikler', start: 'top 80%' } });
+      gsap.from('.process-step', { x: -30, opacity: 0, stagger: 0.15, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: '#surec', start: 'top 75%' } });
+      gsap.from('.philosophy-section p', { y: 30, opacity: 0, stagger: 0.12, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: '.philosophy-section', start: 'top 70%' } });
+      gsap.from('#whatsapp-float', { y: 100, opacity: 0, duration: 0.6, ease: 'back.out(1.7)', delay: 2 });
+
+      const cells = document.querySelectorAll('.grid-cell.highlight');
+      if (cells.length > 0) {
+        gsap.to(cells, { backgroundColor: 'var(--brand-accent)', opacity: 0.85, duration: 1, stagger: { each: 0.2, yoyo: true, repeat: -1 }, ease: 'power1.inOut' });
+      }
+    });
+
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const target = parseInt(el.dataset.count);
+      ScrollTrigger.create({
+        trigger: el, start: 'top 90%', once: true,
+        onEnter: () => gsap.to(el, { textContent: target, duration: 1.5, ease: 'power2.out', snap: { textContent: 1 }, onUpdate: function () { el.textContent = Math.round(parseFloat(el.textContent)); } })
+      });
+    });
+
+    const navbar = document.getElementById('navbar');
+    const heroSection = document.getElementById('hero');
+    new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { navbar.classList.remove('navbar-scrolled'); navbar.classList.add('navbar-transparent'); }
+      else { navbar.classList.remove('navbar-transparent'); navbar.classList.add('navbar-scrolled'); }
+    }, { threshold: 0.1 }).observe(heroSection);
+
+    // Diagnostic Shuffler
+    const shufflerItems = document.querySelectorAll('.shuffler-item');
+    if (shufflerItems.length > 0) {
+      const parent = shufflerItems[0].parentNode;
+      setInterval(() => {
+        parent.appendChild(parent.querySelector('.shuffler-item'));
+        Array.from(parent.querySelectorAll('.shuffler-item')).forEach((el, index) => {
+          if (index === 0) el.className = 'shuffler-item absolute inset-0 bg-brand-bg border border-brand-text/10 rounded-xl p-4 shadow-sm z-30 translate-y-0 scale-100 opacity-100 transition-all duration-500';
+          else if (index === 1) el.className = 'shuffler-item absolute inset-0 bg-brand-bg border border-brand-text/10 rounded-xl p-4 shadow-sm z-20 translate-y-3 scale-[0.95] opacity-60 transition-all duration-500';
+          else el.className = 'shuffler-item absolute inset-0 bg-brand-bg border border-brand-text/10 rounded-xl p-4 shadow-sm z-10 translate-y-6 scale-[0.9] opacity-30 transition-all duration-500';
+        });
+      }, 3000);
+    }
+
+    // Telemetry Typewriter
+    const phrases = ["Müteahhit mali gücü inceleniyor...", "Sözleşme ve ruhsat doğrulanıyor...", "Teminat tutarı hesaplanıyor...", "Risk skoru oluşturuluyor..."];
+    const twEl = document.getElementById('typewriter-text');
+    if (twEl) {
+      let curPhraseIndex = 0;
+      (async function writeLoop() {
+        while (true) {
+          let curWord = phrases[curPhraseIndex];
+          for (let i = 0; i < curWord.length; i++) { twEl.innerText = curWord.substring(0, i + 1); await new Promise(r => setTimeout(r, 60)); }
+          await new Promise(r => setTimeout(r, 1800));
+          for (let i = curWord.length; i > 0; i--) { twEl.innerText = curWord.substring(0, i - 1); await new Promise(r => setTimeout(r, 30)); }
+          await new Promise(r => setTimeout(r, 400));
+          curPhraseIndex = (curPhraseIndex + 1) % phrases.length;
+        }
+      })();
+    }
+
+    /* ===================== WIZARD ===================== */
+    const wizard = document.getElementById('quote-wizard');
+    const steps = Array.from(wizard.querySelectorAll('.wizard-step'));
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const btnSubmit = document.getElementById('btn-submit');
+    const stepLabel = document.getElementById('step-label');
+    const formSuccess = document.getElementById('form-success');
+    let current = 1;
+    const totalSteps = steps.length;
+
+    function renderStep() {
+      steps.forEach(s => s.classList.toggle('active', +s.dataset.step === current));
+      // indicator dots & bars
+      document.querySelectorAll('.step-dot').forEach(d => {
+        const n = +d.dataset.dot;
+        d.classList.toggle('active', n === current);
+        d.classList.toggle('done', n < current);
+        if (n < current) d.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
+        else d.textContent = n;
+      });
+      document.querySelectorAll('.step-bar').forEach(b => b.classList.toggle('done', +b.dataset.bar < current));
+      // nav buttons
+      btnPrev.classList.toggle('invisible', current === 1);
+      const last = current === totalSteps;
+      btnNext.classList.toggle('hidden', last);
+      btnSubmit.classList.toggle('hidden', !last);
+      btnSubmit.classList.toggle('flex', last);
+      stepLabel.textContent = 'Adım ' + current;
+      lucide.createIcons();
+    }
+
+    function validateStep(stepNum) {
+      const stepEl = steps.find(s => +s.dataset.step === stepNum);
+      let ok = true, firstInvalid = null;
+      stepEl.querySelectorAll('[required]').forEach(f => {
+        if (f.offsetParent === null) return; // gizli alanları atla
+        const empty = (f.type === 'checkbox') ? !f.checked : !f.value.trim();
+        if (empty) { f.classList.add('invalid'); ok = false; if (!firstInvalid) firstInvalid = f; }
+        else { f.classList.remove('invalid'); }
+      });
+      if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return ok;
+    }
+
+    btnNext.addEventListener('click', () => {
+      if (!validateStep(current)) return;
+      if (current < totalSteps) { current++; renderStep(); document.getElementById('step-indicator').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    });
+    btnPrev.addEventListener('click', () => {
+      if (current > 1) { current--; renderStep(); document.getElementById('step-indicator').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    });
+
+    // remove invalid highlight on input
+    wizard.addEventListener('input', e => { if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid'); });
+
+    // "Aynı kişi" toggle
+    const samePerson = document.getElementById('same-person');
+    const ettirenFields = document.getElementById('ettiren-fields');
+    const toggleTrack = document.querySelector('.toggle-track');
+    const toggleKnob = document.querySelector('.toggle-knob');
+    function syncSame() {
+      const same = samePerson.checked;
+      ettirenFields.style.display = same ? 'none' : 'grid';
+      toggleTrack.style.background = same ? '#E63B2E' : 'rgba(17,17,17,0.15)';
+      toggleKnob.style.transform = same ? 'translateX(1rem)' : 'translateX(0)';
+    }
+    samePerson.addEventListener('change', syncSame);
+    syncSame();
+
+    // Faydalar CTA -> rol seçip başvuruya kaydır
+    document.querySelectorAll('.benefit-cta').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const map = { owner: 'Mülk Sahibi / Borçlu', contractor: 'Müteahhit' };
+        const val = map[btn.dataset.target];
+        const radio = wizard.querySelector(`input[name="rol"][value="${val}"]`);
+        if (radio) radio.checked = true;
+        current = 1; renderStep();
+        document.getElementById('basvuru').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // Dosya seçim göstergesi
+    document.querySelectorAll('.file-input').forEach(input => {
+      input.addEventListener('change', () => {
+        const list = input.closest('.dropzone').querySelector('.file-list');
+        if (input.files.length === 0) { list.textContent = ''; return; }
+        const names = Array.from(input.files).map(f => f.name);
+        list.textContent = names.length === 1 ? names[0] : names.length + ' dosya seçildi';
+      });
+    });
+
+    // Gönderim
+    wizard.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validateStep(totalSteps)) return;
+
+      const label = btnSubmit.querySelector('.btn-label');
+      const original = label.textContent;
+      label.textContent = 'Gönderiliyor...';
+      btnSubmit.disabled = true; btnSubmit.style.opacity = '0.7';
+
+      if (typeof fbq !== 'undefined') fbq('track', 'Lead');
+      if (typeof gtag !== 'undefined') gtag('event', 'generate_lead');
+
+      function showSuccess() {
+        wizard.style.display = 'none';
+        document.getElementById('step-indicator').style.display = 'none';
+        formSuccess.classList.remove('hidden');
+        formSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        lucide.createIcons();
+      }
+
+      try {
+        // Yerelde (file://) gerçek gönderim yapılamaz -> demo
+        if (location.protocol === 'file:') throw { demo: true };
+        // Netlify Forms: form verisini (dosyalar dahil) mevcut sayfaya POST et
+        const res = await fetch('/', { method: 'POST', body: new FormData(wizard) });
+        if (!res.ok) throw new Error('network');
+        showSuccess();
+      } catch (err) {
+        if (err && err.demo) showSuccess();
+        else {
+          alert('Bir sorun oluştu. Lütfen tekrar deneyin veya 0532 786 54 91 numarasından bize ulaşın.');
+          label.textContent = original; btnSubmit.disabled = false; btnSubmit.style.opacity = '1';
+        }
+      }
+    });
+
+    renderStep();
+
+    /* ===================== HUKUKİ METİN MODALI ===================== */
+    const docModal = document.getElementById('doc-modal');
+    const docTitle = document.getElementById('doc-title');
+    const docBody = document.getElementById('doc-body');
+    const DOC_TITLES = {
+      gizlilik: 'Gizlilik Politikası',
+      sozlesme: 'Kullanıcı Sözleşmesi',
+      police: 'Poliçe Bilgilendirme Formu',
+      kvkk: 'KVKK Aydınlatma Metni',
+      riza: 'Açık Rıza Metni'
+    };
+    function openDoc(key) {
+      const tpl = document.getElementById('tpl-' + key);
+      if (!tpl) return;
+      docTitle.textContent = DOC_TITLES[key] || '';
+      docBody.innerHTML = '';
+      docBody.appendChild(tpl.content.cloneNode(true));
+      docBody.scrollTop = 0;
+      docModal.classList.add('open');
+      docModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+    function closeDoc() {
+      docModal.classList.remove('open');
+      docModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.doc-link').forEach(btn => {
+      btn.addEventListener('click', () => openDoc(btn.dataset.doc));
+    });
+    docModal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeDoc));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && docModal.classList.contains('open')) closeDoc(); });
+  </script>
+</body>
+</html>
